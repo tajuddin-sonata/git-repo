@@ -47,20 +47,23 @@ deployHosts() {
     function join { local IFS="$1"; shift; echo "$*"; }
 
     # NOTE: When selecting one host you will see full log from Saltstate output. When deploying to 'all' we suppress log output.
-    if [[ "$HOSTS" != "all" ]] && [[ ${HOSTS[@]} =~ .*"kafka"[0-10].* ]] && [[ $MATCH_REG == "all" ]]; then 
+    if [[ "$HOSTS" != "all" ]] && [[ ${HOSTS[@]} =~ .*"web"[0-10].* ]] && [[ $MATCH_REG == "all" ]]; then 
         for i in ${HOSTS[@]}; do
-            echo "Processing hosts:  $i using Salt-Master: ${SALT_MASTERS_ALL[$INDEX]}..."
-            ssh root@${SALT_MASTERS_ALL[$INDEX]} "salt '${ENVIRONMENT}-${i}.az.${ENVIRONMENT}.${SHORT_REG}.cloud.net' state.apply $salt_state pillar='{"stack": "$STACK", "Artifact_version": "$VERSION"}' --state-output=full"
-            echo "Deployed to host $i"
+            for salt_master in "${SALT_MASTERS_ALL[@]}"; do
+                echo "Processing hosts:  $i using Salt-Master: $salt_master..."
+                ssh root@$salt_master "salt '${ENVIRONMENT}-${i}.cca.${ENVIRONMENT}.${SHORT_REG}.cloud.247-inc.net' state.apply $salt_state --state-output=full"
+                echo "Deployed to host $i"
+            done
         done
-    elif [[ "$HOSTS" != "all" ]] && [[ ${HOSTS[@]} =~ .*"kafka"[0-10].* ]]; then
+    elif [[ "$HOSTS" != "all" ]] && [[ ${HOSTS[@]} =~ .*"web"[0-10].* ]]; then
         for i in ${HOSTS[@]}; do
-            # Building new list for selected hosts 
-            BUILD_HOSTS+=(${ENVIRONMENT}-${i}.az.${ENVIRONMENT}.${SHORT_REG}.cloud.net)
+            BUILD_HOSTS+=(${ENVIRONMENT}-${i}.cca.${ENVIRONMENT}.${SHORT_REG}.cloud.247-inc.net)
             AGGR_HOSTS=$(join , ${BUILD_HOSTS[@]})
-            echo "Processing hosts:  ${AGGR_HOSTS[@]} using Salt-Master: ${SALT_MASTERS_ALL[$INDEX]}..."
-            ssh root@${SALT_MASTERS_ALL[$INDEX]} "salt -L '${AGGR_HOSTS[@]}' state.apply $salt_state pillar='{"stack": "$STACK", "Artifact_version": "$VERSION"}' --state-output=full"
-            echo "Deployed to ${AGGR_HOSTS[@]}"
+            for salt_master in "${SALT_MASTERS_ALL[@]}"; do
+                echo "Processing hosts:  ${AGGR_HOSTS[@]} using Salt-Master: $salt_master..."
+                ssh root@$salt_master "salt -L '${AGGR_HOSTS[@]}' state.apply $salt_state --state-output=full"
+                echo "Deployed to ${AGGR_HOSTS[@]}"
+            done
         done
     else
         echo "Deployed to $i"
