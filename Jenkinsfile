@@ -15,6 +15,13 @@ pipeline {
             trim: true
         )
 
+        string (
+            defaultValue: 'kafka',
+            description: 'Provide CCA STACK Name to Deploy/Upgrade/Remove such as: xyzcorp',
+            name: 'STACK',
+            trim: true
+        )
+
         choice(
             name: 'REGION',
             description: 'Select Environment for Deployment',

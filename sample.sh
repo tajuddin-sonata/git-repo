@@ -9,7 +9,8 @@ SALT_MASTERS_ALL=(13.90.134.210 52.191.2.63)
 INDEX=$(($RANDOM % ${#SALT_MASTERS_ALL[@]}))
 
 echo "ENVIRONMENT: $ENVIRONMENT"
-echo "ARTIFACT_VERSION: $VERSION"
+echo "VERSION: $VERSION"
+echo STACK: $STACK
 echo "REGION: $REGION"
 echo "HOSTS: $HOSTS"
 echo "SALT_MASTER: ${SALT_MASTERS_ALL[$INDEX]}"
@@ -49,7 +50,7 @@ deployHosts() {
     if [[ "$HOSTS" != "all" ]] && [[ ${HOSTS[@]} =~ .*"kafka"[0-10].* ]] && [[ $MATCH_REG == "all" ]]; then 
         for i in ${HOSTS[@]}; do
             echo "Processing hosts:  $i using Salt-Master: ${SALT_MASTERS_ALL[$INDEX]}..."
-            ssh root@${SALT_MASTERS_ALL[$INDEX]} "salt '${ENVIRONMENT}-${i}.az.${ENVIRONMENT}.${SHORT_REG}.cloud.net' state.apply $salt_state --state-output=full"
+            ssh root@${SALT_MASTERS_ALL[$INDEX]} "salt '${ENVIRONMENT}-${i}.az.${ENVIRONMENT}.${SHORT_REG}.cloud.net' state.apply $salt_state pillar='{"stack": "$STACK", "Artifact_version": "$VERSION"}' --state-output=full"
             echo "Deployed to host $i"
         done
     elif [[ "$HOSTS" != "all" ]] && [[ ${HOSTS[@]} =~ .*"kafka"[0-10].* ]]; then
@@ -58,7 +59,7 @@ deployHosts() {
             BUILD_HOSTS+=(${ENVIRONMENT}-${i}.az.${ENVIRONMENT}.${SHORT_REG}.cloud.net)
             AGGR_HOSTS=$(join , ${BUILD_HOSTS[@]})
             echo "Processing hosts:  ${AGGR_HOSTS[@]} using Salt-Master: ${SALT_MASTERS_ALL[$INDEX]}..."
-            ssh root@${SALT_MASTERS_ALL[$INDEX]} "salt -L '${AGGR_HOSTS[@]}' state.apply $salt_state --state-output=full"
+            ssh root@${SALT_MASTERS_ALL[$INDEX]} "salt -L '${AGGR_HOSTS[@]}' state.apply $salt_state pillar='{"stack": "$STACK", "Artifact_version": "$VERSION"}' --state-output=full"
             echo "Deployed to ${AGGR_HOSTS[@]}"
         done
     else
