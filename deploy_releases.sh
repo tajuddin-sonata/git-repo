@@ -3,7 +3,7 @@ GIT_URL="https://github.com/tajuddin-sonata/salt-states.git"
 GIT_BRANCH="main"
 
 #Note. Randomly pick salt master from the list
-SALT_MASTERS_ALL=(salt-master-1 salt-master2)
+SALT_MASTERS_ALL=(13.90.134.210 52.191.2.63)
 
 SALT_MASTER=${#SALT_MASTERS_ALL[@]}
 INDEX=$(($RANDOM % ${SALT_MASTER[$INDEX]}))
@@ -11,7 +11,7 @@ INDEX=$(($RANDOM % ${SALT_MASTER[$INDEX]}))
 echo ENVIRONMENT: $ENVIRONMENT
 echo API_VERSION: $API_VERSION
 echo REQUEST: $REQUEST
-echo ARTIFACT_VERSION: $VERSION
+echo ARTIFACT_VERSION: $VERSION 
 echo REGION: $REGION
 echo HOSTS: $HOSTS
 echo SALT_MASTER: ${SALT_MASTERS_ALL[$INDEX]}
@@ -73,3 +73,6 @@ else
 echo "Deployed to $i"
 fi
 }
+
+# Call the deployHosts function
+deployHosts
