@@ -3,7 +3,7 @@ GIT_URL="https://github.com/tajuddin-sonata/salt-states.git"
 GIT_BRANCH="main"
 
 # Note: Randomly pick a salt master from the list
-SALT_MASTERS_ALL=(salt-master-1 salt-master-2)
+SALT_MASTERS_ALL=(salt-master-1 salt-master2)
 
 # Get a random index for selecting a salt master
 INDEX=$(($RANDOM % ${#SALT_MASTERS_ALL[@]}))
